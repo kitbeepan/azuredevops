@@ -1,0 +1,47 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Maven@3
+  displayName: 'Build and Package the Application'
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'clean package'
+    options: '-DskipTests'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.8'
+    mavenVersionOption: 'Default'
+    mavenOptions: '-Xmx3072m'
+    mavenAuthenticateFeed: false
+    effectivePomSkip: false
+    sonarQubeRunAnalysis: false
+
+# - task: WhiteSource Bolt@20
+#   inputs:
+#     cwd: '$(System.DefaultWorkingDirectory)'
+#     advance: false
+- task: prisma-cloud-compute-scan@2
+  displayName: 'Prisma Cloud-Serverless AWS Function Scan'
+  inputs:
+    scanType: 'serverless'
+    twistlockService: 'NRG-PRISMA-COMPUTE-PROD'
+    artifact: '$(System.DefaultWorkingDirectory)/target/$(ARTIFACT_NAME)'
+
+- task: Prisma Cloud IaC Scan@2
+  displayName: 'Prisma Cloud-IAC Scan Cloud Formation Templates'
+  inputs:
+    Path: '$(IAC_TEMPLATE_DIR_NAME)'
+    prismaCloudService: 'NRG-PRISMA-IAC-PROD'
+    High: '0'
+    Medium: '0'
+    Low: '0'
+    Operator: 'or'
+    Tags: 'env:demo'
