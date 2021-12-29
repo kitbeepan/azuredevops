@@ -28,20 +28,10 @@ steps:
 #   inputs:
 #     cwd: '$(System.DefaultWorkingDirectory)'
 #     advance: false
-- task: prisma-cloud-compute-scan@2
-  displayName: 'Prisma Cloud-Serverless AWS Function Scan'
+
+- task: prisma-cloud-compute-scan@3
   inputs:
     scanType: 'serverless'
-    twistlockService: 'NRG-PRISMA-COMPUTE-PROD'
+    twistlockService: 'PCC-ECS'
     artifact: '$(System.DefaultWorkingDirectory)/target/$(ARTIFACT_NAME)'
 
-- task: Prisma Cloud IaC Scan@2
-  displayName: 'Prisma Cloud-IAC Scan Cloud Formation Templates'
-  inputs:
-    Path: '$(IAC_TEMPLATE_DIR_NAME)'
-    prismaCloudService: 'NRG-PRISMA-IAC-PROD'
-    High: '0'
-    Medium: '0'
-    Low: '0'
-    Operator: 'or'
-    Tags: 'env:demo'
