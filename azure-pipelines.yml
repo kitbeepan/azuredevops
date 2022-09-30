@@ -1,6 +1,8 @@
-container: "ubuntu:18.04"
-pool: 
-  vmImage: ubuntu-18.04
-steps: 
-  - 
-    script: printenv
+name : Docker-CI
+trigger:
+  branches:
+    include:
+      - master
+ 
+pool:
+  vmImage: 'ubuntu-latest'
